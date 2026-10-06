@@ -123,6 +123,24 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", updateActiveNav, { passive: true });
   updateActiveNav();
 
+  // Scroll to hash on page load if present
+  if (window.location.hash) {
+    try {
+      const hashEl = document.querySelector(window.location.hash);
+      const mainContain = document.querySelector(".main-containe");
+      if (hashEl) {
+        setTimeout(function () {
+          if (mainContain) {
+            mainContain.scrollTop = hashEl.offsetTop;
+            mainContain.scrollLeft = 0;
+          } else {
+            hashEl.scrollIntoView({ behavior: "instant", block: "start" });
+          }
+        }, 150);
+      }
+    } catch (e) {}
+  }
+
   // 4. TESTIMONIALS SLIDER
   const slider = document.querySelector(".Testimonials");
   if (slider) {
@@ -321,5 +339,71 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   console.log("Biogi Portfolio initialized successfully.");
-});
 
+  // 6. PORTFOLIO FILTERING & MODAL
+  const portfolioFilterBtns = document.querySelectorAll(".portfolio-filter-btn");
+  const portfolioCards = document.querySelectorAll(".portfolio-card");
+  const portfolioModal = document.getElementById("portfolio-detail-modal");
+  const modalTitle = document.getElementById("modal-project-title");
+  const modalCategory = document.getElementById("modal-project-category");
+  const modalDesc = document.getElementById("modal-project-desc");
+  const modalTech = document.getElementById("modal-project-tech");
+  const modalLive = document.getElementById("modal-project-live");
+  const portfolioModalClose = document.querySelector(".portfolio-modal-close");
+
+  const portfolioData = [{"id":1,"title":"Arcturustech","category":"Corporate Website","desc":"Corporate website developed using WordPress and Elementor.","tags":["WordPress","Elementor","PHP","JavaScript"],"filter":"wordpress php"},{"id":2,"title":"Predicta Digital","category":"WordPress / Business Website","desc":"WordPress business website project.","tags":["WordPress","Elementor","PHP","JavaScript"],"filter":"wordpress php"},{"id":3,"title":"Predicta Analytics","category":"WordPress / Business / Analytics","desc":"WordPress business and analytics website project.","tags":["WordPress","Elementor","PHP","JavaScript"],"filter":"wordpress php"},{"id":4,"title":"Heenan Brown Immigration","category":"WordPress / Business","desc":"WordPress business website project.","tags":["WordPress","Elementor","PHP"],"filter":"wordpress php"},{"id":5,"title":"ShareWorld Solutions","category":"WordPress / Business","desc":"WordPress business website project.","tags":["WordPress","Elementor","JavaScript"],"filter":"wordpress"},{"id":6,"title":"FCDHCI","category":"WordPress / Organization","desc":"WordPress organization website project.","tags":["WordPress","Elementor","PHP"],"filter":"wordpress php"},{"id":7,"title":"Strat Finance Sahil","category":"WordPress / Finance","desc":"WordPress finance-focused website project.","tags":["WordPress","Elementor","PHP"],"filter":"wordpress php"},{"id":8,"title":"Sparkwise Academy","category":"LMS / WordPress / Education","desc":"WordPress learning and education project.","tags":["WordPress","LMS","Elementor"],"filter":"wordpress lms"},{"id":9,"title":"iSellHub","category":"LMS / eCommerce","desc":"LMS and eCommerce project.","tags":["WordPress","LMS","eCommerce"],"filter":"wordpress lms ecommerce"},{"id":10,"title":"ResellHub","category":"eCommerce / MLM","desc":"eCommerce and MLM project.","tags":["eCommerce","MLM","PHP"],"filter":"ecommerce mlm php"},{"id":11,"title":"Shop To Success","category":"eCommerce / MLM","desc":"eCommerce and MLM project.","tags":["eCommerce","MLM","PHP"],"filter":"ecommerce mlm php"},{"id":12,"title":"SDR Kart","category":"eCommerce / MLM","desc":"eCommerce and MLM project.","tags":["eCommerce","MLM","PHP"],"filter":"ecommerce mlm php"},{"id":13,"title":"Liviyoung","category":"eCommerce / Laravel / MLM","desc":"eCommerce and MLM project built with Laravel.","tags":["eCommerce","Laravel","MLM","PHP"],"filter":"ecommerce laravel mlm php"}];
+
+  if (portfolioFilterBtns.length && portfolioCards.length) {
+    portfolioFilterBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        portfolioFilterBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const filterValue = btn.getAttribute("data-filter");
+
+        portfolioCards.forEach(function (card) {
+          const category = card.getAttribute("data-category") || "";
+          if (filterValue === "all" || category.includes(filterValue)) {
+            card.classList.remove("is-hidden");
+          } else {
+            card.classList.add("is-hidden");
+          }
+        });
+      });
+    });
+  }
+
+  // Portfolio Details Modal Popup
+  const detailBtns = document.querySelectorAll(".portfolio-details-btn");
+  detailBtns.forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const pIndex = parseInt(btn.getAttribute("data-project"), 10);
+      const proj = portfolioData[pIndex];
+      if (proj && portfolioModal) {
+        if (modalTitle) modalTitle.textContent = proj.title;
+        if (modalCategory) modalCategory.textContent = proj.category;
+        if (modalDesc) modalDesc.textContent = proj.desc;
+        if (modalTech) modalTech.textContent = proj.tags.join(", ");
+        if (modalLive) modalLive.setAttribute("href", "#portfolio");
+        portfolioModal.style.display = "flex";
+      }
+    });
+  });
+
+  if (portfolioModalClose && portfolioModal) {
+    portfolioModalClose.addEventListener("click", function (e) {
+      e.preventDefault();
+      portfolioModal.style.display = "none";
+    });
+  }
+
+  if (portfolioModal) {
+    portfolioModal.addEventListener("click", function (e) {
+      if (e.target === portfolioModal) {
+        portfolioModal.style.display = "none";
+      }
+    });
+  }
+
+});
